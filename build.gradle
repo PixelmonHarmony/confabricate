@@ -21,8 +21,8 @@ indra.javaVersions {
 
 
 repositories {
-    stellardriftReleases()
-    stellardriftSnapshots()
+    stellardrift.releases()
+    stellardrif.snapshots()
 }
 
 tasks.withType(Jar).configureEach {
