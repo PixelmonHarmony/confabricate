@@ -1,4 +1,3 @@
-
 import ca.stellardrift.build.common.MinecraftDependenciesKt
 import ca.stellardrift.build.configurate.ConfigFormats
 import ca.stellardrift.build.configurate.transformations.ConfigurateTransformations
@@ -22,7 +21,7 @@ indra.javaVersions {
 
 repositories {
     stellardrift.releases()
-    stellardrif.snapshots()
+    stellardrift.snapshots()
 }
 
 tasks.withType(Jar).configureEach {
