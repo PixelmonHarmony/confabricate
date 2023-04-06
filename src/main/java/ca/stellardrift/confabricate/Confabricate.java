@@ -20,19 +20,26 @@ import com.google.errorprone.annotations.RestrictedApi;
 import com.mojang.datafixers.DSL;
 import com.mojang.datafixers.DataFixer;
 import com.mojang.serialization.Dynamic;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
+import io.leangen.geantyref.TypeToken;
 import net.minecraft.SharedConstants;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.util.datafix.DataFixers;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.AddReloadListenerEvent;
+import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.fml.ModContainer;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.spongepowered.configurate.CommentedConfigurationNode;
-import org.spongepowered.configurate.ConfigurateException;
-import org.spongepowered.configurate.ConfigurationNode;
-import org.spongepowered.configurate.ConfigurationOptions;
-import org.spongepowered.configurate.NodePath;
+import org.spongepowered.configurate.*;
 import org.spongepowered.configurate.extra.dfu.v4.ConfigurateOps;
 import org.spongepowered.configurate.extra.dfu.v4.DataFixerTransformation;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
@@ -45,6 +52,8 @@ import org.spongepowered.configurate.transformation.TransformAction;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Configurate integration holder, providing access to configuration loaders
@@ -55,7 +64,9 @@ import java.nio.file.Path;
  *
  * @since 1.0.0
  */
-public class Confabricate implements ModInitializer {
+
+@Mod(Confabricate.MOD_ID)
+public class Confabricate {
 
     static final String MOD_ID = "confabricate";
 
@@ -78,6 +89,10 @@ public class Confabricate implements ModInitializer {
         }
     }
 
+    public Confabricate() {
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onInitialize);
+    }
+
     /**
      * Internal API to get a mod {@link ResourceLocation}.
      *
@@ -91,8 +106,7 @@ public class Confabricate implements ModInitializer {
         return new ResourceLocation(MOD_ID, item);
     }
 
-    @Override
-    public void onInitialize() {
+    public void onInitialize(FMLCommonSetupEvent event) {
         // initialize serializers early, fail fast
         MinecraftSerializers.collection();
     }
@@ -270,16 +284,16 @@ public class Confabricate implements ModInitializer {
      * @since 1.1.0
      */
     public static Path configurationFile(final ModContainer mod, final boolean ownDirectory) {
-        Path configRoot = FabricLoader.getInstance().getConfigDir();
+        Path configRoot = FMLPaths.CONFIGDIR.get();
         if (ownDirectory) {
-            configRoot = configRoot.resolve(mod.getMetadata().getId());
+            configRoot = configRoot.resolve(mod.getModId());
         }
         try {
             Files.createDirectories(configRoot);
         } catch (final IOException ignore) {
             // we tried
         }
-        return configRoot.resolve(mod.getMetadata().getId() + ".conf");
+        return configRoot.resolve(mod.getModId() + ".conf");
     }
 
     /**
@@ -364,5 +378,4 @@ public class Confabricate implements ModInitializer {
                 // Don't know why, but the rest of the game uses this version.
                 .targetVersion(SharedConstants.getCurrentVersion().getDataVersion().getVersion());
     }
-
 }

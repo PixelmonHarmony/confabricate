@@ -15,6 +15,7 @@
  */
 package ca.stellardrift.confabricate.typeserializers;
 
+import ca.stellardrift.confabricate.Confabricate;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.concurrent.LazyInit;
 import com.mojang.datafixers.util.Either;
@@ -88,7 +89,7 @@ final class ConfabricateHolderSet<V> extends HolderSet.ListBacked<V> {
         return this.contents().contains(entry);
     }
 
-    sealed interface TagEntry<V> {
+    public interface TagEntry<V> {
 
         String TAG_PREFIX = "#";
         String ID = "id";
@@ -136,7 +137,7 @@ final class ConfabricateHolderSet<V> extends HolderSet.ListBacked<V> {
 
             @Override
             public void collect(final Registry<V> registry, final Consumer<Holder<V>> collector) {
-                collector.accept(registry.getOrCreateHolder(this.item));
+                collector.accept(registry.getOrCreateHolder(this.item).getOrThrow(false, System.out::println));
             }
 
             @Override

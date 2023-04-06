@@ -1,0 +1,28 @@
+modLoader = "javafml"
+loaderVersion = "[43,)"
+#issueTrackerURL = ""
+license = "Apache v2.0"
+
+[[mods]]
+modId = "confabricate"
+version = "3.0.0-SNAPSHOT+4.1.2"
+displayName = "Confabricate"
+authors = "zml, Waterpicker (ported to forge)"
+description = '''
+Configurate bindings for Forge
+'''
+#logoFile = ""
+
+[[dependencies.confabricate]]
+modId = "forge"
+mandatory = true
+versionRange = "[43,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.confabricate]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.19.2,)"
+ordering = "NONE"
+side = "BOTH"

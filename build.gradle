@@ -1,11 +1,6 @@
-
-import ca.stellardrift.build.common.MinecraftDependenciesKt
-import ca.stellardrift.build.configurate.ConfigFormats
-import ca.stellardrift.build.configurate.transformations.ConfigurateTransformations
-
 plugins {
     id 'net.ltgt.errorprone' version '2.0.2'
-    id 'fabric-loom' version '0.12.+'
+    id 'dev.architectury.loom' version '1.0-SNAPSHOT'
     id 'io.github.juuxel.loom-quiltflower' version '1.8.0'
     id 'ca.stellardrift.opinionated' version '5.0.1'
     id 'ca.stellardrift.configurate-transformations' version '5.0.1'
@@ -66,32 +61,32 @@ loom {
   }
 }
 
-tasks.withType(net.fabricmc.loom.task.RunGameTask) {
-  javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(indra.javaVersions().target().map { v -> JavaLanguageVersion.of(v) })})
-}
+//tasks.withType(net.fabricmc.loom.task.RunGameTask) {
+//  javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(indra.javaVersions().target().map { v -> JavaLanguageVersion.of(v) })})
+//}
 
 // Convert yaml files to josn
-tasks.withType(ProcessResources).configureEach {
-    inputs.property("versionConfigurate", versionConfigurate)
-
-    // Convert data files yaml -> json
-    filesMatching(
-        [
-            "fabric.mod",
-            "data/**/*",
-            "assets/**/*"
-        ].collect { base -> ["${base}.yml".toString(), "${base}.yaml".toString()] }
-        .flatten()
-    ) {
-        ConfigurateTransformations.convertFormat(it, ConfigFormats.YAML, ConfigFormats.JSON)
-        if (name.startsWith("fabric.mod")) {
-            expand project: project, versionConfigurate: versionConfigurate
-        }
-        name = name.substring(0, name.lastIndexOf('.')) + ".json"
-    }
-    // Convert pack meta, without changing extension
-    filesMatching("pack.mcmeta") { convertFormat(ConfigFormats.YAML, ConfigFormats.JSON) }
-}
+//tasks.withType(ProcessResources).configureEach {
+//    inputs.property("versionConfigurate", versionConfigurate)
+//
+//    // Convert data files yaml -> json
+//    filesMatching(
+//        [
+//            "fabric.mod",
+//            "data/**/*",
+//            "assets/**/*"
+//        ].collect { base -> ["${base}.yml".toString(), "${base}.yaml".toString()] }
+//        .flatten()
+//    ) {
+//        ConfigurateTransformations.convertFormat(it, ConfigFormats.YAML, ConfigFormats.JSON)
+//        if (name.startsWith("fabric.mod")) {
+//            expand project: project, versionConfigurate: versionConfigurate
+//        }
+//        name = name.substring(0, name.lastIndexOf('.')) + ".json"
+//    }
+//    // Convert pack meta, without changing extension
+//    filesMatching("pack.mcmeta") { convertFormat(ConfigFormats.YAML, ConfigFormats.JSON) }
+//}
 
 quiltflower {
   fromDependency("org.quiltmc:quiltflower:$versionQuiltflower")
@@ -109,10 +104,9 @@ dependencies {
     minecraft "com.mojang:minecraft:$versionMinecraft"
     mappings loom.layered {
         officialMojangMappings()
-        parchment "org.parchmentmc.data:parchment-$versionParchment@zip"
+//        parchment "org.parchmentmc.data:parchment-$versionParchment@zip"
     }
-    modImplementation "net.fabricmc:fabric-loader:$versionLoader"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:$versionFabricApi"
+    forge "net.minecraftforge:forge:1.19.2-43.2.4"
 
     // We can't add the bom because loom doesn't put it into our pom correctly
     include modApi("org.spongepowered:configurate-core:$versionConfigurate")
@@ -126,8 +120,6 @@ dependencies {
 
     include "com.typesafe:config:1.4.2"
     include api("io.leangen.geantyref:geantyref:1.3.13")
-
-    checkstyle "ca.stellardrift:stylecheck:0.2.0"
 }
 
 indra {

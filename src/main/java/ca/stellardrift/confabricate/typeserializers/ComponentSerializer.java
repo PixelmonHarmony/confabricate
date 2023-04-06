@@ -21,7 +21,6 @@ import com.google.gson.JsonElement;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextComponent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.configurate.ConfigurationNode;
@@ -50,7 +49,7 @@ final class ComponentSerializer implements TypeSerializer<Component> {
             if (text.startsWith("{")) { // Legacy format as JSON
                 return Component.Serializer.fromJson(text);
             } else {
-                return new TextComponent(text);
+                return Component.nullToEmpty(text);
             }
         }
     }
@@ -66,19 +65,18 @@ final class ComponentSerializer implements TypeSerializer<Component> {
             return;
         }
 
-        if (obj instanceof final TextComponent text) {
-            if (text.getSiblings().isEmpty() && text.getStyle().equals(Style.EMPTY)) {
-                value.raw(text.getContents());
-                return;
-            }
-        }
+
+//        if (obj.getSiblings().isEmpty() && obj.getStyle().equals(Style.EMPTY)) {
+//            value.raw(obj.getContents());
+//            return;
+//        }
 
         value.from(JsonOps.INSTANCE.convertTo(opsFor(value), Component.Serializer.toJsonTree(obj)));
     }
 
     @Override
     public Component emptyValue(final Type specificType, final ConfigurationOptions options) {
-        return new TextComponent("");
+        return Component.nullToEmpty("");
     }
 
 }
